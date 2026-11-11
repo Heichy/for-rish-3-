@@ -1297,12 +1297,14 @@ const LOVE_LETTER = `
         <strong>With all the affection my heart could hold.</strong>
     `;
 
-// YES: ROMANTIC LOVE LETTER
+// YES: NOTE SHOWN AFTER THE DATE IS LOCKED IN
+const YES_NOTE = `OMGGGGGG!! DID YOU ACTUALLY SAY YES??? T-T<br><br>I THINK I'M GONNA CRY AAAAAAAAAA<br><br>YOU JUST MADE MY DAYYYYY!! I'M SO HAPPYYYY AAAAAA OMAGAD OMAGAD,<br><br>I REALLY LOVE YOUUU!! 😭❤️`;
 $('letterBtn').addEventListener('click', () => {
     notify('She opened your love letter 💌', 'Irish opened the letter', 'love_letter', 4);
-    $('letterText').innerHTML = LOVE_LETTER;
+    $('letterText').innerHTML = YES_NOTE;
     $('letterSignoff').textContent = '';
     $('modal').classList.remove('hidden');
+    $('letterBody').scrollTop = 0;
 });
 
 // ===== INTRO PAGES 3 + 4: "feelings" question -> notes -> "note popped up" -> love note =====
