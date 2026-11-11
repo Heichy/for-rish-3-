@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>A little question for Irish 💗</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@500;700;800&display=swap');
@@ -281,22 +281,82 @@ button.ovClose{position:absolute;top:16px;right:16px;width:40px;height:40px;padd
   .dcard.card.gone{transform:translateX(125%) rotate(9deg)}
 }
 
-/* ===== PHONE FIX v2: stop the page zooming out / painting in a tiny box ===== */
-html{width:100%;max-width:100%;overflow-x:hidden;-webkit-text-size-adjust:100%;text-size-adjust:100%;overscroll-behavior-x:none}
-body{width:100%;max-width:100vw;overflow-x:hidden;overflow-x:clip;min-height:100vh;min-height:100dvh}
-/* cards that fly off to the side must never widen the page */
-.deck{max-width:100%}
-.dcard.card.gone{transform:translateX(40%) rotate(6deg);visibility:hidden;transition:transform .8s cubic-bezier(.2,.85,.2,1.05),opacity .6s ease,visibility 0s .8s}
-.overview{max-width:100vw;overflow-x:hidden}
-/* viz: real centered box, never wider than the screen */
-#viz{width:min(100%,900px);max-width:100vw}
-/* go easy on the phone GPU (blur layers were what made it stop painting) */
-.dcard.card:not(.front){-webkit-backdrop-filter:none;backdrop-filter:none}
-@media (max-width:700px){
-  .card{-webkit-backdrop-filter:none;backdrop-filter:none;background:linear-gradient(135deg,#ffffff30,#ff9ccb28)}
-  body.dark .card{background:linear-gradient(135deg,#ffffff14,#ff3d8a1c)}
-  .avatar::after{filter:blur(8px);animation:ledSpin 2.6s linear infinite}
-  .cloud{filter:none}
+/* ===== FIX: HEARTS / CONFETTI / FLOATING NOTES NEVER COVER THE LETTER ===== */
+/* fx canvas = 50, floating notes = 58, player + theme switch = 60.  Letter now sits above the effects
+   (but still under the player / theme buttons, which the letter leaves room for). */
+.modal{z-index:59}
+#fx{z-index:40}
+.fnote{z-index:45}
+
+/* ===== LETTER: close button stays put, only the text scrolls ===== */
+:root{--topSafe:env(safe-area-inset-top,0px);--botSafe:env(safe-area-inset-bottom,0px)}
+.modal{padding:calc(60px + var(--topSafe)) 14px calc(76px + var(--botSafe))}
+.letter{display:flex;flex-direction:column;overflow:hidden;padding:0;
+  width:min(92vw,560px);max-height:calc(100vh - 140px - var(--topSafe) - var(--botSafe));max-height:calc(100dvh - 140px - var(--topSafe) - var(--botSafe))}
+.letterBody{overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:30px 24px 24px}
+.letterBody::-webkit-scrollbar{width:6px}.letterBody::-webkit-scrollbar-thumb{background:#f17caf;border-radius:10px}
+.letter h2{margin:0 36px 14px 0;font-size:clamp(11px,2.6vw,15px)}
+.letter p{margin:0}
+button.close{position:absolute;right:10px;top:10px;z-index:2;width:38px;height:38px;padding:0;border-radius:50%;
+  display:grid;place-items:center;font-size:24px;line-height:1;background:#ffffffb0;color:#b51e62;border:1.5px solid #ffc2de}
+body.dark button.close{background:#ffffff1f;color:#ff9ccb;border-color:#ff7eb666}
+/* light mode: letter was too see-through over the blur */
+body:not(.dark) .letter{background:linear-gradient(135deg,#fff6fbf5,#ffd9ebf2)}
+body:not(.dark) .letter p{color:#6c1743}
+
+/* ===== TOUCH POLISH ===== */
+button,.option,.mopt{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+@media(hover:none){button:hover{transform:none;filter:none}.mopt:hover{transform:none;box-shadow:inherit}}
+body{min-height:100vh;min-height:100dvh}
+.themeSw{top:calc(14px + var(--topSafe));left:calc(14px + env(safe-area-inset-left,0px))}
+.player{bottom:calc(14px + var(--botSafe));right:calc(14px + env(safe-area-inset-right,0px))}
+
+/* ===== TABLET (iPad portrait + landscape) ===== */
+@media(min-width:700px){
+  .deck{width:min(86vw,540px)}
+  .deck .dcard.card{min-height:560px;padding:72px 36px 36px}
+  .deck .dcard h1{font-size:clamp(18px,2.6vw,23px)}
+  .deck .dcard .sub{font-size:17px}
+  .deck .avatar{width:120px;height:120px;font-size:62px}
+  .deck .mopt{padding:18px 20px}.deck .mopt b{font-size:18px}.deck .mopt small{font-size:14px}
+  #mainCard{width:min(86vw,620px);min-height:620px;padding:44px 36px}
+  #mainCard h1{font-size:clamp(20px,3vw,28px)}
+  #mainCard .sub{font-size:17px}
+  #mainCard .avatar{width:124px;height:124px}
+  .cal-wrap{width:min(100%,400px)}button.day{height:42px;font-size:16px}
+  .options{width:min(100%,440px)}.option{font-size:15px;padding:15px 10px}
+  .letterBody{padding:36px 36px 28px}.letter p{font-size:18px;line-height:1.75}
+  .letter h2{font-size:17px}
+  #subText{font-size:17px}
+}
+/* side lyrics only when there is really room (was 1100px: too cramped on iPad landscape) */
+.lyrSide{display:none}
+@media(min-width:1240px){.lyrSide{display:block}}
+
+/* ===== PHONE ===== */
+@media(max-width:560px){
+  .letterBody{padding:26px 18px 20px}
+  .letter p{font-size:16px;line-height:1.7}
+  .letter{border-radius:24px}
+  .card{border-radius:28px}
+  .actions{gap:12px}
+  .yes{font-size:13px;padding:15px 18px}
+  button.day{height:40px}
+  .dcard.card{padding-left:16px;padding-right:16px}
+  .navBtn{top:12px;padding:8px 12px}.navBtn.tl{left:12px}.navBtn.tr{right:12px}
+}
+@media(max-width:360px){.deck{width:94vw}h1{font-size:14px}.navBtn{font-size:11px;padding:7px 10px}}
+
+/* ===== PHONE / SMALL TABLET IN LANDSCAPE (short screens) ===== */
+@media(max-height:520px){
+  body{padding:56px 0 64px}
+  .card,.deck .dcard.card,#mainCard{min-height:0}
+  .deck .dcard.card{padding:56px 22px 22px}
+  .avatar{width:76px;height:76px;font-size:40px}
+  .modal{padding:calc(52px + var(--topSafe)) 12px calc(60px + var(--botSafe))}
+  .letter{max-height:calc(100dvh - 112px - var(--topSafe) - var(--botSafe))}
+  .letterBody{padding:20px 22px 18px}
+  .subs{display:none}
 }
 </style>
 </head>
@@ -451,10 +511,12 @@ body{width:100%;max-width:100vw;overflow-x:hidden;overflow-x:clip;min-height:100
 <div id="modal" class="modal hidden">
   <div class="letter">
     <button class="close" id="closeModal" aria-label="Close">×</button>
-    <h2 id="modalTitle">A LITTLE NOTE FOR YOU ♡</h2>
-    <p id="letterText"></p>
-    <p id="letterSignoff" style="text-align:right;color:#c51e68;font-weight:800"></p>
-    <div style="text-align:center;margin-top:18px"><button type="button" class="primary" id="modalNext" style="margin-top:0;padding:12px 34px">Next ›</button></div>
+    <div class="letterBody" id="letterBody">
+      <h2 id="modalTitle">A LITTLE NOTE FOR YOU ♡</h2>
+      <p id="letterText"></p>
+      <p id="letterSignoff" style="text-align:right;color:#c51e68;font-weight:800"></p>
+      <div style="text-align:center;margin-top:18px"><button type="button" class="primary" id="modalNext" style="margin-top:0;padding:12px 34px">Next ›</button></div>
+    </div>
   </div>
 </div>
 
@@ -906,13 +968,12 @@ const BARS = 46, levels = new Array(BARS).fill(0);
 let actx = null, analyser = null, fdata = null, useReal = false, vizRunning = false, master = 0, vw = 0, vh = 0;
 
 function resizeViz(){
-    const d = Math.min(window.devicePixelRatio || 1, 2), r = viz.getBoundingClientRect();
+    const d = window.devicePixelRatio || 1, r = viz.getBoundingClientRect();
     vw = r.width; vh = r.height;
     viz.width = vw * d; viz.height = vh * d;
     vctx.setTransform(d,0,0,d,0,0);
 }
-resizeViz(); addEventListener('resize', resizeViz); addEventListener('orientationchange', () => setTimeout(resizeViz, 300));
-const LITE = matchMedia('(pointer:coarse)').matches;
+resizeViz(); addEventListener('resize', resizeViz);
 
 function setupAnalyser(){
     if (actx) { actx.resume && actx.resume(); return; }
@@ -958,7 +1019,7 @@ function vizLoop(now){
     // mirrored waveform bars (bass in the middle, highs toward the edges)
     const gap = vw / (BARS + 1), maxH = vh * .6;
     vctx.lineCap = 'round'; vctx.lineWidth = Math.max(4, gap * .5);
-    vctx.strokeStyle = 'rgba(255,255,255,.8)'; vctx.shadowColor = '#ff4d94'; vctx.shadowBlur = LITE ? 0 : 14;
+    vctx.strokeStyle = 'rgba(255,255,255,.8)'; vctx.shadowColor = '#ff4d94'; vctx.shadowBlur = 14;
     for (let i=0;i<BARS;i++){
         const d = Math.abs(i - (BARS-1)/2) / half;      // 0 at center, 1 at edges
         let target;
@@ -988,12 +1049,12 @@ let W, H, parts = [], running = false, endAt = 0, nextBurst = 0;
 const COLORS = ['#ff4d94','#ff9ccb','#ffffff','#ffd166','#c77dff','#7ae7ff','#ff6b6b','#fff1a8'];
 const rnd = (a,b) => a + Math.random()*(b-a);
 function resizeFx(){
-    const d = Math.min(window.devicePixelRatio || 1, 2);
-    W = document.documentElement.clientWidth || innerWidth; H = innerHeight;
+    const d = window.devicePixelRatio || 1;
+    W = innerWidth; H = innerHeight;
     fx.width = W*d; fx.height = H*d;
     ctx.setTransform(d,0,0,d,0,0);
 }
-resizeFx(); addEventListener('resize', resizeFx); addEventListener('orientationchange', () => setTimeout(resizeFx, 300));
+resizeFx(); addEventListener('resize', resizeFx);
 
 function firework(x, y){
     const color = COLORS[Math.floor(Math.random()*COLORS.length)];
@@ -1252,7 +1313,7 @@ function showModal(title, html, afterClose){
     $('letterSignoff').textContent = '';
     modalAfterClose = afterClose || null;
     $('modal').classList.remove('hidden');
-    $('modal').scrollTop = 0; document.querySelector('#modal .letter').scrollTop = 0;
+    $('modal').scrollTop = 0; document.querySelector('#modal .letter').scrollTop = 0; $('letterBody').scrollTop = 0;
 }
 function hideModal(){
     if ($('modal').classList.contains('hidden')) return;
