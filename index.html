@@ -159,7 +159,7 @@ body.dark #subText{background:#2a0c33f8}
 .modal{padding:64px 14px 140px}
 .letter{max-height:calc(100vh - 210px);max-height:calc(100dvh - 210px)}
 @media (max-width:700px),(max-height:760px){
-  body{padding:64px 0 150px}
+  body{padding:64px 0 92px}
 }
 @media (max-width:430px){
   .player{gap:3px;padding:5px 6px}
@@ -377,6 +377,74 @@ body:not(.dark) .gate input{background:#ffffffc0;color:#a52b65}
 body:not(.dark) .gateErr{color:#c51e68}
 .gate .card.shake{animation:gateShake .45s}
 @keyframes gateShake{20%{transform:translateX(-10px)}40%{transform:translateX(9px)}60%{transform:translateX(-6px)}80%{transform:translateX(4px)}}
+
+/* ===== TABLETS: keep the fixed Dark/Light + player buttons off the cards, shrink the planner ===== */
+@media(min-width:700px){
+  body{padding-top:64px;padding-bottom:84px}
+  #plan .avatar{width:84px;height:84px;font-size:44px;margin-bottom:0}
+  #plan h1{margin:10px 0 6px}
+  button.day{height:38px}
+}
+/* ===== LANDSCAPE (iPad + big phones): planner in two columns, safe top/bottom space ===== */
+@media(orientation:landscape) and (min-width:640px) and (max-height:900px){
+  body{padding-top:56px;padding-bottom:76px}
+  #mainCard:has(#plan:not(.hidden)){width:min(94vw,860px)}
+  #plan:not(.hidden){display:grid;grid-template-columns:1fr 1fr;column-gap:26px;align-items:start}
+  #plan .avatar{display:none}
+  #plan>h1:nth-of-type(1){grid-column:1;grid-row:1;margin-top:0}
+  #plan>p.sub:nth-of-type(1){grid-column:1;grid-row:2}
+  #plan>.cal-wrap{grid-column:1;grid-row:3 / span 4;width:100%;margin:0}
+  #plan>h1:nth-of-type(2){grid-column:2;grid-row:1;margin-top:0!important}
+  #plan>p.sub:nth-of-type(2){grid-column:2;grid-row:2}
+  #plan>.options{grid-column:2;grid-row:3;width:100%;margin:10px 0;gap:8px}
+  #plan>#lockBtn{grid-column:2;grid-row:4;margin-top:6px}
+}
+
+/* ===== LANDSCAPE PHONES / SHORT SCREENS: compact layout so nothing gets cut off ===== */
+@media (max-height:520px) and (orientation:landscape){
+  body{padding:calc(36px + var(--topSafe)) 0 calc(8px + var(--botSafe))}
+  .themeSw{transform:scale(.8);transform-origin:top left;top:calc(6px + var(--topSafe))}
+  .player{transform:scale(.85);transform-origin:bottom right;bottom:calc(6px + var(--botSafe))}
+  .deck{width:min(78vw,600px)}
+  .deck .dcard.card{min-height:0;padding:46px 26px 16px}
+  .card,#mainCard{min-height:0;padding:16px 24px}
+  #mainCard{width:min(78vw,600px)}
+  .avatar,.deck .avatar,#mainCard .avatar,.gate .avatar{width:58px;height:58px;font-size:30px;margin:0 auto 4px;border-radius:18px}
+  .dcard h1,h1,#mainCard h1,.gate h1{font-size:14px;margin:8px 0 6px;line-height:1.5}
+  .dcard .sub,.sub,.deck .dcard .sub,#mainCard .sub{font-size:13px;margin:0 0 6px;line-height:1.4}
+  .dcard p,.card p{font-size:13px;line-height:1.4}
+  .pixel.small,.dcard .pixel[style*="font-size"]{font-size:9px!important}
+  .actions{margin-top:10px;gap:12px}
+  .yes{font-size:12px;padding:12px 16px}
+  button{padding:9px 16px;font-size:14px}
+  #startBtn,.deck .primary{margin-top:8px}
+  .deck .mopt{padding:9px 14px}.deck .mopt b{font-size:14px}.deck .mopt small{font-size:11px}
+  .mopts{gap:7px}
+  .note{margin-top:10px;font-size:11px}
+  .navBtn{top:8px;padding:6px 11px;font-size:12px}.navBtn.tl{left:10px}.navBtn.tr{right:10px}
+  .subs{display:none}
+  /* date planner: calendar on the left, activities on the right */
+  #mainCard:has(#plan:not(.hidden)){width:min(94vw,820px)}
+  #plan:not(.hidden){display:grid;grid-template-columns:1fr 1fr;column-gap:22px;align-items:start}
+  #plan .avatar{display:none}
+  #plan>h1:nth-of-type(1){grid-column:1;grid-row:1;margin-top:0}
+  #plan>p.sub:nth-of-type(1){grid-column:1;grid-row:2}
+  #plan>.cal-wrap{grid-column:1;grid-row:3 / span 4;width:100%;margin:0}
+  #plan>h1:nth-of-type(2){grid-column:2;grid-row:1;margin-top:0!important}
+  #plan>p.sub:nth-of-type(2){grid-column:2;grid-row:2}
+  #plan>.options{grid-column:2;grid-row:3;width:100%;margin:8px 0;gap:6px}
+  #plan>#lockBtn{grid-column:2;grid-row:4;margin-top:4px}
+  button.day{height:30px;font-size:13px}.option{font-size:12px;padding:9px 6px}
+  /* password gate */
+  .gate{align-items:start}
+  .gate .card{width:min(80vw,440px);padding:18px 22px}
+  .gate input{margin-top:8px;padding:10px}.gateErr{min-height:16px;margin-top:6px}
+  #gateNotesBtn{padding:14px 14px;font-size:11px}
+  /* letter popup */
+  .modal{padding:calc(8px + var(--topSafe)) 12px calc(56px + var(--botSafe))}
+  .letter{max-height:calc(100dvh - 64px - var(--topSafe) - var(--botSafe));max-height:calc(100vh - 64px - var(--topSafe) - var(--botSafe))}
+  .letterBody{padding:18px 22px 14px}.letter p{font-size:15px;line-height:1.6}
+}
 </style>
 </head>
 <body class="dark">
@@ -384,7 +452,7 @@ body:not(.dark) .gateErr{color:#c51e68}
   <div class="card" id="gateCard">
     <div id="gateLock">
       <div class="avatar">🔒</div>
-      <h1 class="pixel">IS THAT U IRISH??</h1>
+      <h1 class="pixel">PASSWORD?</h1>
       <p class="sub">This page is locked. Type the password to continue ♡</p>
       <input id="gatePw" type="password" inputmode="text" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="••••••••" aria-label="Password">
       <div class="gateErr" id="gateErr" role="alert"></div>
