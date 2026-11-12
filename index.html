@@ -705,8 +705,8 @@ function notify(title, message, tags='heart', priority=3){
     if (!jobs.length) return Promise.resolve('No Discord webhook / Telegram bot is set yet (see the top of the notifications section).');
     return Promise.all(jobs).then(r => r.join('\n'));
 }
-// TEST: open  index.html?notifytest  to send a test message and see the result on screen
-if (/[?&#](notify|ntfy)test/.test(location.search + location.hash)){
+// TEST: open  index.html?notifyme  to send a test message and see the result on screen
+if (/[?&#]notifyme/.test(location.search + location.hash)){
     window.addEventListener('load', () => {
         notify('TEST from your website', 'If you see this, notifications work!', 'white_check_mark', 4)
             .then(r => alert('Notification test:\n' + r))
