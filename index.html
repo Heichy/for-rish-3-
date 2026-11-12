@@ -690,20 +690,18 @@ function notify(title, message, tags='heart', priority=3){
     if (isOwner() && !NOTIFY_FORCE) return Promise.resolve('skipped (owner browser)');
     const icon = ICONS[tags] || '💗';
     const when = new Date().toLocaleString();
-    let n = 1;
-    try { n = (parseInt(localStorage.getItem('nCount'), 10) || 0) + 1; localStorage.setItem('nCount', String(n)); } catch(e){}
     const SEP = '===============================';
     const jobs = [];
     if (DISCORD_WEBHOOK){
         jobs.push(fetch(DISCORD_WEBHOOK, {
             method:'POST', keepalive:true,
             headers:{ 'Content-Type':'application/json' },
-            body: JSON.stringify({ username:'Irish site', content: `${SEP}\n${n}. ${icon} **${title}**\n${message}\n🕒 ${when}` })
+            body: JSON.stringify({ username:'Irish site', content: `${SEP}\n${icon} **${title}**\n${message}\n🕒 ${when}` })
         }).then(r => { if (!r.ok) throw new Error('Discord HTTP ' + r.status); return 'Discord: ok'; })
           .catch(e => 'Discord FAILED: ' + (e.message || e)));
     }
     if (TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID){
-        const q = new URLSearchParams({ chat_id: TELEGRAM_CHAT_ID, text: `${SEP}\n${n}. ${icon} ${title}\n${message}\n🕒 ${when}` });
+        const q = new URLSearchParams({ chat_id: TELEGRAM_CHAT_ID, text: `${SEP}\n${icon} ${title}\n${message}\n🕒 ${when}` });
         jobs.push(fetch('https://api.telegram.org/bot' + TELEGRAM_BOT_TOKEN + '/sendMessage?' + q.toString(), { keepalive:true })
           .then(r => { if (!r.ok) throw new Error('Telegram HTTP ' + r.status); return 'Telegram: ok'; })
           .catch(e => 'Telegram FAILED: ' + (e.message || e)));
