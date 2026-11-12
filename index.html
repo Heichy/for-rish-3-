@@ -676,36 +676,41 @@ const $ = id => document.getElementById(id);
 
 let choice = [];
 
-// ===== NOTIFICATIONS TO ME (via ntfy.sh) =====
-const NTFY_TOPIC = 'irish-answer-bi8f5933';
+// ===== NOTIFICATIONS TO ME (Discord webhook and/or Telegram bot) =====
+// Fill in ONE of these (or both). Leave '' to turn a channel off.
+const DISCORD_WEBHOOK   = '';   // e.g. 'https://discord.com/api/webhooks/123456/abcDEF...'
+const TELEGRAM_BOT_TOKEN = '';  // e.g. '123456:ABC-DEF...'   (from @BotFather)
+const TELEGRAM_CHAT_ID   = '';  // e.g. '123456789'           (your own chat id)
+
+const ICONS = { eyes:'👀', envelope:'✉️', musical_note:'🎵', mute:'🔇', fast_forward:'⏩', arrow_forward:'▶️',
+                tada:'🎉', calendar:'📅', love_letter:'💌', heart:'💗', broken_heart:'💔', see_no_evil:'🙈', white_check_mark:'✅' };
 function notify(title, message, tags='heart', priority=3){
-    const msg = message + '\n' + new Date().toLocaleString();
-    // 1) normal way (JSON publish)
-    let p;
-    try {
-        p = fetch('https://ntfy.sh/', {
-            method:'POST',
-            keepalive:true,
-            body: JSON.stringify({ topic: NTFY_TOPIC, title, message: msg, tags: [tags], priority })
-        }).then(r => { if (!r.ok) throw new Error('ntfy HTTP ' + r.status); return 'ok'; });
-    } catch(e) { p = Promise.reject(e); }
-    // 2) backup way if the first one is blocked or fails (plain GET, works even where fetch/CORS is blocked)
-    p = p.catch(err => new Promise(res => {
-        try {
-            const img = new Image();
-            img.onload = img.onerror = () => res('backup sent (' + (err && err.message || err) + ')');
-            img.src = 'https://ntfy.sh/' + encodeURIComponent(NTFY_TOPIC) + '/publish?' +
-                new URLSearchParams({ title, message: msg, tags, priority }).toString();
-        } catch(e2) { res('failed: ' + e2.message); }
-    }));
-    return p;
+    const icon = ICONS[tags] || '💗';
+    const when = new Date().toLocaleString();
+    const jobs = [];
+    if (DISCORD_WEBHOOK){
+        jobs.push(fetch(DISCORD_WEBHOOK, {
+            method:'POST', keepalive:true,
+            headers:{ 'Content-Type':'application/json' },
+            body: JSON.stringify({ username:'Irish site', content: `${icon} **${title}**\n${message}\n🕒 ${when}` })
+        }).then(r => { if (!r.ok) throw new Error('Discord HTTP ' + r.status); return 'Discord: ok'; })
+          .catch(e => 'Discord FAILED: ' + (e.message || e)));
+    }
+    if (TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID){
+        const q = new URLSearchParams({ chat_id: TELEGRAM_CHAT_ID, text: `${icon} ${title}\n${message}\n🕒 ${when}` });
+        jobs.push(fetch('https://api.telegram.org/bot' + TELEGRAM_BOT_TOKEN + '/sendMessage?' + q.toString(), { keepalive:true })
+          .then(r => { if (!r.ok) throw new Error('Telegram HTTP ' + r.status); return 'Telegram: ok'; })
+          .catch(e => 'Telegram FAILED: ' + (e.message || e)));
+    }
+    if (!jobs.length) return Promise.resolve('No Discord webhook / Telegram bot is set yet (see the top of the notifications section).');
+    return Promise.all(jobs).then(r => r.join('\n'));
 }
-// TEST: open  index.html?ntfytest  to send a test notification and see the result on screen
-if (/[?&#]ntfytest/.test(location.search + location.hash)){
+// TEST: open  index.html?notifytest  to send a test message and see the result on screen
+if (/[?&#](notify|ntfy)test/.test(location.search + location.hash)){
     window.addEventListener('load', () => {
-        notify('TEST from your website', 'If you see this, ntfy works!', 'white_check_mark', 4)
-            .then(r => alert('ntfy test: ' + r + '\nTopic: ' + NTFY_TOPIC))
-            .catch(e => alert('ntfy test FAILED: ' + e));
+        notify('TEST from your website', 'If you see this, notifications work!', 'white_check_mark', 4)
+            .then(r => alert('Notification test:\n' + r))
+            .catch(e => alert('Notification test FAILED: ' + e));
     });
 }
 notify('She opened it!', 'Irish just opened your link 👀', 'eyes', 3);
