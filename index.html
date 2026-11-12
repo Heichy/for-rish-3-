@@ -358,9 +358,46 @@ body{min-height:100vh;min-height:100dvh}
   .letterBody{padding:20px 22px 18px}
   .subs{display:none}
 }
+
+/* ===== PASSWORD GATE + "NOTES?? CLICK HERE" ===== */
+.gate{position:fixed;inset:0;z-index:95;display:grid;place-items:center;padding:calc(20px + env(safe-area-inset-top,0px)) 16px calc(20px + env(safe-area-inset-bottom,0px));overflow-y:auto;
+  background:radial-gradient(circle at 30% 15%,#5a1646,#1b0620 70%)}
+body:not(.dark) .gate{background:linear-gradient(135deg,#ffd6e9,#ff9bc9,#f56ba9)}
+.gate .card{min-height:0;width:min(92vw,440px);padding:38px 24px 32px}
+.gate .avatar{margin:0 auto 6px}
+.gate h1{margin:14px 0 8px}
+.gate .sub{margin:0 0 4px}
+.gate input{width:100%;margin-top:16px;padding:14px;font:800 16px 'Nunito',sans-serif;text-align:center;letter-spacing:2px;text-transform:uppercase;
+  border:2px solid #ff9ccb;border-radius:14px;background:#ffffff1f;color:#fff;outline:none}
+body:not(.dark) .gate input{background:#ffffffc0;color:#a52b65}
+.gate input:focus{border-color:#ff5fa8;box-shadow:0 0 14px #ff8cbd80}
+.gate button{margin-top:14px}
+#gateNotesBtn{font-family:'Press Start 2P',monospace;font-size:13px;line-height:1.7;padding:20px 18px;animation:startPulse 1.8s ease-in-out infinite}
+.gateErr{min-height:20px;margin-top:10px;font-size:14px;font-weight:800;color:#ff8fbd}
+body:not(.dark) .gateErr{color:#c51e68}
+.gate .card.shake{animation:gateShake .45s}
+@keyframes gateShake{20%{transform:translateX(-10px)}40%{transform:translateX(9px)}60%{transform:translateX(-6px)}80%{transform:translateX(4px)}}
 </style>
 </head>
 <body class="dark">
+<div class="gate" id="gate">
+  <div class="card" id="gateCard">
+    <div id="gateLock">
+      <div class="avatar">🔒</div>
+      <h1 class="pixel">IS THAT U IRISH??</h1>
+      <p class="sub">This page is locked. Type the password to continue ♡</p>
+      <input id="gatePw" type="password" inputmode="text" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="••••••••" aria-label="Password">
+      <div class="gateErr" id="gateErr" role="alert"></div>
+      <button type="button" class="primary" id="gateGo">UNLOCK 🔓</button>
+    </div>
+    <div id="gateNotes" class="hidden">
+      <div class="avatar">💌</div>
+      <h1 class="pixel">UNLOCKED!</h1>
+      <p class="sub">Before anything else...</p>
+      <button type="button" class="yes" id="gateNotesBtn">NOTES?? CLICK HERE!!</button>
+    </div>
+  </div>
+</div>
 <div class="themeSw" id="themeSw">
   <button type="button" class="themeBtn active" id="darkBtn">🌙 Dark</button>
   <button type="button" class="themeBtn" id="lightBtn">☀️ Light</button>
@@ -498,6 +535,45 @@ body{min-height:100vh;min-height:100dvh}
 # PASTE YOUR SIDE LYRICS BELOW THIS LINE (one line per row, no quotes needed).
 # Lines starting with # are ignored. Leave empty to use the built-in lines.
 # Optional exact timing: start a line with [minutes:seconds], e.g. [00:12] your line
+[00:01.03] Her love is in your head
+[00:02.96] You lost your earrings in her bed
+[00:06.36] You couldn't tell her that you lost them
+[00:09.41] 'Cause you're scared and you're not talking
+[00:12.49] So you think of what to say
+[00:15.33] Then save it for another day
+[00:18.52] 'Cause you just never had the heart
+[00:21.57] Now they just drift further apart
+[00:24.12] From you
+[00:30.13] From you
+[00:36.15] From you
+[00:41.83] From you
+[01:12.69] Her love is in your head
+[01:14.99] You lost your earrings in her bed
+[01:18.19] You couldn't tell her that you lost them
+[01:21.66] 'Cause you're scared and you're not talking
+[01:24.56] So you think of what to say
+[01:26.93] Then save it for another day
+[01:30.14] 'Cause you just never had the heart
+[01:33.04] Now they just drift further apart
+[01:36.32] From you
+[01:37.77] Extra, extra read all about it
+[01:40.28] Malcolm's in his feelings and he can't get out of it (from you)
+[01:43.70] Extra, extra read all about it
+[01:46.34] Malcolm's in his feelings and he can't get out of it (from you)
+[01:49.60] Extra, extra read all about it
+[01:52.37] Malcolm's in his feelings and he can't get out of it (from you)
+[01:55.36] Extra, extra read all about it
+[01:58.47] Malcolm's in his feelings and he can't get out of it
+[02:00.97] From you
+[02:06.23] From you
+[02:11.80] From you
+[02:13.23] Extra, extra read all about it
+[02:16.31] Malcolm's in his feelings and he can't get out of it (from you)
+[02:19.02] Extra, extra read all about it
+[02:22.13] Malcolm's in his feelings and he can't get out of it
+[02:25.04] Can't get out of it
+[02:26.94] Can't get out of it
+[02:29.21] I hope you like my mixtape
 </script>
 <audio id="bgm" src="music.mp3" loop preload="auto"></audio>
 <div class="player hidden" id="player">
@@ -823,6 +899,7 @@ $('ccBtn').addEventListener('click', () => {
 // This list is separate from the top subtitle. Put your own lines here.
 // Each item can be a plain string (auto-timed every LYR_EVERY seconds)
 // or { t: seconds, text: '...' } for an exact time.
+const LYR_OFFSET = 0;   // seconds: +0.5 = lyrics show 0.5s earlier, -0.5 = later (fine-tune sync here)
 const LYR_EVERY = 7;
 const LYRICS_RAW = [
     'Some feelings are hard to say out loud',
@@ -888,7 +965,7 @@ function sideChange(idx){
     });
 }
 function updateLyr(){
-    const t = bgm.currentTime; let idx = -1;
+    const t = bgm.currentTime + LYR_OFFSET; let idx = -1;
     for (let i=0;i<LYRICS.length;i++) if (t >= LYRICS[i].t) idx = i;
     if (idx !== lyrIdx){ lyrIdx = idx; sideChange(idx); }
 }
@@ -897,8 +974,8 @@ function karaoke(){
     const g = Math.floor(lyrIdx/2), panel = g % 2 === 0 ? lyrL : lyrR;
     const ln = panel.querySelectorAll('.ln')[lyrIdx % 2]; if (!ln) return;
     const start = LYRICS[lyrIdx].t, nx = LYRICS[lyrIdx+1];
-    const end = nx ? nx.t : start + LYR_EVERY;
-    const frac = Math.min(1, Math.max(0, (bgm.currentTime - start) / Math.max(.5, end - start) * 1.2));
+    const end = Math.min(nx ? nx.t : start + LYR_EVERY, start + 5);  // long gaps: fill at singing speed
+    const frac = Math.min(1, Math.max(0, (bgm.currentTime + LYR_OFFSET - start) / Math.max(.5, end - start) * 1.2));
     const ws = ln.querySelectorAll('.w'), n = Math.ceil(frac * ws.length);
     ws.forEach((w,i) => w.classList.toggle('fill', i < n));
 }
@@ -906,7 +983,7 @@ setInterval(() => {
     if (!ccOn) return;
     if (bgm.paused && capIdx < 0) return;
     updateCap(); updateLyr(); karaoke();
-}, 100);
+}, 50);
 matchMedia('(min-width:1100px)').addEventListener('change', () => { lyrIdx = -1; lyrGroup = -2; clearSide(); });
 
 
@@ -944,6 +1021,53 @@ fetch('lyrics.txt', { cache: 'no-store' })
     .then(txt => { const items = parseLyricsFile(txt); if (items.length){ lyrItems = items; applyFileLyrics(); } })
     .catch(() => {});
 bgm.addEventListener('loadedmetadata', applyFileLyrics);
+
+// ===== TAP-TO-SYNC: open the page as  index.html?sync  =====
+if (/[?&#]sync/.test(location.search + location.hash)){
+    const REACT = 0.25;   // seconds: people tap a bit after they hear the line, so we take this off
+    const L = (lyrItems || []).map(x => typeof x === 'object' ? x.text : x);
+    const box = document.createElement('div');
+    box.style.cssText = 'position:fixed;z-index:90;left:50%;transform:translateX(-50%);bottom:calc(76px + env(safe-area-inset-bottom,0px));width:min(94vw,520px);padding:14px;border-radius:20px;background:#1b0620ee;color:#fff;font:700 15px Nunito,sans-serif;text-align:center;box-shadow:0 10px 40px #000a;border:1.5px solid #ff7eb6';
+    box.innerHTML = '<div id="sy_info" style="font-size:12px;opacity:.8;margin-bottom:6px"></div>' +
+        '<div id="sy_cur" style="min-height:44px;font-size:17px;color:#ffc2de;margin-bottom:10px"></div>' +
+        '<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">' +
+        '<button id="sy_start" class="primary" style="margin:0;padding:12px 16px">▶ Start</button>' +
+        '<button id="sy_tap" class="primary" style="margin:0;padding:12px 26px;font-size:18px">TAP</button>' +
+        '<button id="sy_undo" style="padding:12px 14px">Undo</button>' +
+        '<button id="sy_prev" style="padding:12px 14px">Preview</button></div>' +
+        '<textarea id="sy_out" readonly style="display:none;width:100%;height:110px;margin-top:10px;font:12px monospace"></textarea>';
+    document.body.appendChild(box);
+    let st = [], i = 0;
+    const fmt = t => { t = Math.max(0, t); const m = Math.floor(t/60), r = (t - m*60).toFixed(1); return '[' + String(m).padStart(2,'0') + ':' + (r < 10 ? '0' : '') + r + ']'; };
+    const out = () => L.map((l,k) => (st[k] != null ? fmt(st[k]) + ' ' : '') + l).join('\n');
+    const info = $('sy_info'), cur = $('sy_cur'), ta = $('sy_out');
+    function draw(){
+        if (!L.length){ info.textContent = 'No lyrics found.'; return; }
+        if (i < L.length){
+            info.textContent = 'Line ' + (i+1) + ' / ' + L.length + ' — tap (or press Space) the moment this line STARTS';
+            cur.textContent = L[i];
+        } else {
+            info.textContent = 'Done! Copy the text below and paste it into the lyricsText block (or lyrics.txt).';
+            cur.textContent = '✓ all lines timed';
+            ta.style.display = 'block'; ta.value = out(); ta.select();
+            try { navigator.clipboard.writeText(ta.value); } catch(e){}
+        }
+    }
+    function tap(){
+        if (bgm.paused || i >= L.length) return;
+        st[i++] = Math.max(0, bgm.currentTime - REACT); draw();
+    }
+    $('sy_start').onclick = () => { i = 0; st = []; ta.style.display = 'none'; bgm.loop = false; bgm.muted = false; bgm.currentTime = 0; bgm.play().catch(()=>{}); draw(); };
+    $('sy_tap').onclick = tap;
+    $('sy_undo').onclick = () => { if (i > 0){ i--; st.length = i; ta.style.display = 'none'; draw(); } };
+    $('sy_prev').onclick = () => {
+        const items = L.map((t,k) => ({ t: st[k] != null ? st[k] : (st[k-1] || 0) + 4, text: t }));
+        setLyrics(items, LYR_EVERY); ccOn = true; $('ccBtn').classList.add('on');
+        bgm.loop = true; bgm.currentTime = 0; bgm.play().catch(()=>{});
+    };
+    addEventListener('keydown', e => { if (e.code === 'Space' || e.code === 'Enter'){ e.preventDefault(); tap(); } });
+    draw();
+}
 
 // ===== MUSIC EFFECTS: beat glow + floating notes =====
 bgm.addEventListener('play',  () => $('player').classList.add('playing'));
@@ -1447,6 +1571,67 @@ $('modalNext').addEventListener('click', hideModal);
 $('modal').addEventListener('click', e => {
     if (e.target === $('modal')) hideModal();
 });
+
+// ===== PASSWORD GATE -> "NOTES?? CLICK HERE!!" -> notes -> the site =====
+const GATE_PASSWORD = 'REJECTED';   // not case-sensitive
+const GATE_NOTES = `Uhmm, hiiii!! :33<br>
+I made this website just for youuu!<br><br>
+Gumawa ako ng website para maging fun siya ;-; and para hindi awkward huhu.<br><br>
+I dunnooo, I feel like I could show you this website through a QR code or just send it to you directly. But tbh, I kinda want to give it to you through a QR code, like a little chocolate box with a QR code inside. :&gt;&gt;<br><br>
+Anywayzzz...<br>
+I WILL RESPECT YOUR DECISION! &lt;3<br>
+SO PLEASE, BE HONEST, OKAYYYYY? DON'T FEEL BAD FOR ME OR ANYTHING.<br>
+I PROMISE I CAN TAKE IT. :)))<br><br>
+BUT I JUST HAVE ONE LITTLE WISH...<br>
+I HOPE THAT AFTER I CONFESS, THINGS WON'T GET AWKWARD BETWEEN US. ;-;<br><br>
+CAUSEEEE, YOU'RE ONLY REJECTING MY FEELINGS, NOT ME AS A PERSON, RIGHTTT? BUT OF COURSE, IT STILL DEPENDS ON YOU.<br>
+IF YOU'RE STILL COMFORTABLE BEING FRIENDS WITH ME, THEN THAT'S GOODDDD!<br>
+BECAUSE EVEN IF I GET REJECTED, I STILL WANT TO MAKE YOU HAPPY AND SEE YOU SMILE. :)))<br><br>
+CAUSE I'M NOT GONNA BE AROUND FOREVER EHHH ;-;<br>
+IF YOU REJECT ME, I'LL GO FLY FLY AWAYYYYY AFTER SHS.<br>
+BUT IF YOU ACCEPT MY FEELINGS, THEN I'LL STAY STAYYYYY. :33<br>
+CAUSE YKKKK, I CAN FLY FLY AWAY ANYTIMEEEEEEEE.<br><br>
+BUT SERIOUSLY, I REALLY DO LOVE YOU.<br>
+EVERY TIME WE'RE WALKING TOGETHER AND YOU SUDDENLY DISAPPEAR, ONLY FOR ME TO TURN AROUND AND FIND YOU SITTING SOMEWHERE, PETTING A CAT...<br>
+LIKEEEEE, EWAN KO BA AAAAAA.<br>
+I DON'T KNOW WHY, BUT EVERY TIME THAT HAPPENS, I JUST MELT. T-T<br>
+LIKE, YOU'RE SO ADORABLEEEEEEEEEEEEEEEEE. SUPER DUPER ADORABLEEEEE. ;-;<br><br>
+I'M JUST BEING HONEST ABOUT HOW I FEEL RIGHT NOWWW.<br>
+SO PLEASE, JUST BE HONEST WITH ME, OKAYYYY? &gt;:))<br><br>
+AND BTW, YOU DON'T HAVE TO REPLY TO ALL THE NOTES I'VE WRITTEN FOR YOU. I DON'T WANT TO MAKE IT A HASSLE.<br>
+YOU CAN JUST CLICK THE (NO) BUTTON FIVE TIMES, AND I'LL UNDERSTAND. :)))<br>
+AND I'LL KNOW WHICH BUTTON YOU CLICKED BECAUSE I'LL GET A NOTIFICATION. :&gt;&gt;<br><br>
+OKAYYYYYYYYYYYYYYYYYY!!<br>
+BUT ANYWAYYYYY, HERE WE GOOOOO!<br><br>
+IF YOU'RE INTERESTED IN READING THE LETTERS I'VE WRITTEN JUST FOR YOU...<br>
+CLICK START!<br>
+BUT IF YOU'RE NOT INTERESTED, THAT'S COMPLETELY FINE TOO!<br>
+YOU CAN JUST SKIP EVERYTHING AND CLICK (NO) FIVE TIMES.<br>
+:33<br><br>
+AND LASTLYYYYY...<br>
+IF YOU ENCOUNTER ANY PROBLEMS, BUGS, OR ANYTHING WEIRD WHILE USING THE WEBSITE, JUST LET ME KNOW, OKAYYYYY?<br>
+I HOPE YOU ENJOY ITTTT!! &lt;333`;
+(function(){
+    const pw = $('gatePw'), err = $('gateErr'), card = $('gateCard');
+    function tryUnlock(){
+        if (pw.value.trim().toUpperCase() === GATE_PASSWORD){
+            $('gateLock').classList.add('hidden');
+            $('gateNotes').classList.remove('hidden');
+        } else {
+            err.textContent = 'Wrong password 😭 try again!';
+            card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake');
+            pw.select();
+        }
+    }
+    $('gateGo').addEventListener('click', tryUnlock);
+    pw.addEventListener('keydown', e => { if (e.key === 'Enter') tryUnlock(); });
+    pw.addEventListener('input', () => { err.textContent = ''; });
+    $('gateNotesBtn').addEventListener('click', () => {
+        $('gate').classList.add('hidden');
+        showModal('NOTES FOR YOU ♡', GATE_NOTES);
+    });
+    setTimeout(() => { try { pw.focus(); } catch(e){} }, 150);
+})();
 </script>
 </body>
 </html>
