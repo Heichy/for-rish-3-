@@ -679,19 +679,34 @@ let choice = [];
 // ===== NOTIFICATIONS TO ME (via ntfy.sh) =====
 const NTFY_TOPIC = 'irish-answer-bi8f5933';
 function notify(title, message, tags='heart', priority=3){
+    const msg = message + '\n' + new Date().toLocaleString();
+    // 1) normal way (JSON publish)
+    let p;
     try {
-        fetch('https://ntfy.sh/', {
+        p = fetch('https://ntfy.sh/', {
             method:'POST',
             keepalive:true,
-            body: JSON.stringify({
-                topic: NTFY_TOPIC,
-                title,
-                message: message + '\n' + new Date().toLocaleString(),
-                tags: [tags],
-                priority
-            })
-        }).catch(()=>{});
-    } catch(e) {}
+            body: JSON.stringify({ topic: NTFY_TOPIC, title, message: msg, tags: [tags], priority })
+        }).then(r => { if (!r.ok) throw new Error('ntfy HTTP ' + r.status); return 'ok'; });
+    } catch(e) { p = Promise.reject(e); }
+    // 2) backup way if the first one is blocked or fails (plain GET, works even where fetch/CORS is blocked)
+    p = p.catch(err => new Promise(res => {
+        try {
+            const img = new Image();
+            img.onload = img.onerror = () => res('backup sent (' + (err && err.message || err) + ')');
+            img.src = 'https://ntfy.sh/' + encodeURIComponent(NTFY_TOPIC) + '/publish?' +
+                new URLSearchParams({ title, message: msg, tags, priority }).toString();
+        } catch(e2) { res('failed: ' + e2.message); }
+    }));
+    return p;
+}
+// TEST: open  index.html?ntfytest  to send a test notification and see the result on screen
+if (/[?&#]ntfytest/.test(location.search + location.hash)){
+    window.addEventListener('load', () => {
+        notify('TEST from your website', 'If you see this, ntfy works!', 'white_check_mark', 4)
+            .then(r => alert('ntfy test: ' + r + '\nTopic: ' + NTFY_TOPIC))
+            .catch(e => alert('ntfy test FAILED: ' + e));
+    });
 }
 notify('She opened it!', 'Irish just opened your link 👀', 'eyes', 3);
 
