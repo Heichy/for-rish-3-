@@ -305,6 +305,7 @@ body:not(.dark) .letter{background:linear-gradient(135deg,#fff6fbf5,#ffd9ebf2)}
 body:not(.dark) .letter p{color:#6c1743}
 
 /* ===== TOUCH POLISH ===== */
+@media(hover:none){.card,.dcard.card,.letter,.gate .card,.themeSw,.player{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}}
 button,.option,.mopt{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 @media(hover:none){button:hover{transform:none;filter:none}.mopt:hover{transform:none;box-shadow:inherit}}
 body{min-height:100vh;min-height:100dvh}
@@ -855,13 +856,7 @@ document.querySelectorAll('.viewBtn').forEach(b => b.addEventListener('click', o
 $('ovClose').addEventListener('click', closeOverview);
 $('overview').addEventListener('click', e => { if (e.target === $('overview') || e.target === $('ovGrid')) closeOverview(); });
 
-// gentle floating hearts while the intro cards are showing
-setInterval(() => {
-    if (deck.classList.contains('hidden')) return;
-    parts.push({ t:'heart', x:rnd(0,W), y:H+10, vx:rnd(-.4,.4), vy:rnd(-1.7,-.8), life:1, decay:.0035,
-                 c: Math.random()<.5 ? '#ff9ccb' : '#ff4d94', g:0, s:rnd(10,18) });
-    if (!running){ running = true; requestAnimationFrame(loop); }
-}, 450);
+// (floating hearts removed to keep phones smooth)
 
 $('playPause').addEventListener('click', () => {
     if (bgm.paused){ if (bgm.muted){ bgm.muted = false; syncVolIcon(); } bgm.play().catch(()=>{}); }
@@ -1141,6 +1136,7 @@ if (/[?&#]sync/.test(location.search + location.hash)){
 bgm.addEventListener('play',  () => $('player').classList.add('playing'));
 bgm.addEventListener('pause', () => $('player').classList.remove('playing'));
 setInterval(() => {
+    return;   // floating ♪ ♡ notes removed (lag on phones)
     if (bgm.paused || bgm.muted || $('player').classList.contains('hidden')) return;
     const n = document.createElement('div');
     n.className = 'fnote';
@@ -1254,7 +1250,6 @@ function firework(x, y){
         const a = Math.PI*2*i/70, sp = rnd(2,6.5);
         parts.push({t:'spark',x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:1,decay:rnd(.012,.022),c:color,g:.05});
     }
-    for(let i=0;i<14;i++) parts.push({t:'heart',x,y,vx:rnd(-4,4),vy:rnd(-5,1),life:1,decay:.014,c:'#ff4d94',g:.06,s:rnd(10,18)});
 }
 function confettiCannon(x, y, dir){
     for(let i=0;i<55;i++){
@@ -1308,12 +1303,9 @@ function celebrate(){
 // ===== TAP EFFECTS ON EVERY BUTTON =====
 function tapBurst(x, y){
     const cols = ['#ff4d94','#ff9ccb','#ffffff','#ffd166','#c77dff'];
-    for(let i=0;i<9;i++){
+    for(let i=0;i<5;i++){
         const a = rnd(0, Math.PI*2), sp = rnd(1.5,4.5);
         parts.push({t:'spark',x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-1,life:1,decay:rnd(.025,.04),c:cols[Math.floor(Math.random()*cols.length)],g:.08});
-    }
-    for(let i=0;i<6;i++){
-        parts.push({t:'heart',x,y,vx:rnd(-2.2,2.2),vy:rnd(-4.5,-1.5),life:1,decay:.02,c:i%2?'#ff4d94':'#ff9ccb',g:.07,s:rnd(9,15)});
     }
     if(!running){ running = true; requestAnimationFrame(loop); }
 }
