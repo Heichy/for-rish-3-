@@ -186,30 +186,6 @@ body:has(#modal:not(.hidden)) .subs{display:none}
   body{padding-top:108px}
 }
 
-/* ===== SIDE LYRICS ===== */
-.lyrSide{display:none;position:fixed;top:50%;transform:translateY(-50%);width:calc(50vw - 340px);max-width:680px;z-index:4;pointer-events:none}
-.lyrSide.left{left:3vw;text-align:left}
-.lyrSide.right{right:3vw;text-align:right}
-@media(min-width:1100px){.lyrSide{display:block}}
-.ln{margin:0 0 20px;font-weight:800;font-size:clamp(22px,2.3vw,38px);line-height:1.25;color:rgba(255,255,255,.26);
-    transition:color .4s,transform .5s,filter .4s;text-shadow:0 2px 14px #00000055}
-.left .ln{transform-origin:left center}.right .ln{transform-origin:right center}
-.ln.done{color:rgba(255,255,255,.45)}
-.ln.on{color:rgba(255,255,255,.55);transform:scale(1.07)}
-.ln .w{transition:color .25s,text-shadow .3s}
-.ln.on .w.fill{color:#fff;text-shadow:0 0 16px #ff4d94,0 0 32px #ff4d9477}
-.pair.inL .ln{animation:lyrInL .8s cubic-bezier(.2,.9,.3,1.1) backwards}
-.pair.inR .ln{animation:lyrInR .8s cubic-bezier(.2,.9,.3,1.1) backwards}
-.pair .ln:nth-child(2){animation-delay:.15s}
-.pair.leave{animation:lyrOut .5s ease forwards}
-@keyframes lyrInL{from{opacity:0;transform:translateX(-80px);filter:blur(10px)}to{opacity:1;filter:blur(0)}}
-@keyframes lyrInR{from{opacity:0;transform:translateX(80px);filter:blur(10px)}to{opacity:1;filter:blur(0)}}
-@keyframes lyrOut{to{opacity:0;filter:blur(8px);transform:scale(.96)}}
-body:not(.dark) .ln{color:rgba(168,23,89,.28);text-shadow:0 2px 12px #ffffff80}
-body:not(.dark) .ln.done{color:rgba(168,23,89,.45)}
-body:not(.dark) .ln.on{color:rgba(168,23,89,.55)}
-body:not(.dark) .ln.on .w.fill{color:#a81759;text-shadow:0 0 14px #ffffffcc}
-
 /* ===== VOLUME SLIDER FIX (the page's generic input style was adding padding/border) ===== */
 #vol{-webkit-appearance:none;appearance:none;--p:70%;width:78px;height:6px;padding:0;margin:0 8px;border:0;border-radius:99px;outline:none;box-shadow:none;cursor:pointer;
   background:linear-gradient(to right,#ed347e var(--p),#ed347e40 var(--p))}
@@ -330,9 +306,6 @@ body{min-height:100vh;min-height:100dvh}
   .letter h2{font-size:17px}
   #subText{font-size:17px}
 }
-/* side lyrics only when there is really room (was 1100px: too cramped on iPad landscape) */
-.lyrSide{display:none}
-@media(min-width:1240px){.lyrSide{display:block}}
 
 /* ===== PHONE ===== */
 @media(max-width:560px){
@@ -603,53 +576,7 @@ html,body{max-width:100%;overflow-x:hidden;overflow-x:clip;overscroll-behavior-x
   <div class="ovGrid" id="ovGrid"></div>
   <p class="ovHint">Tap a page to jump to it ♡</p>
 </div>
-
-<div class="lyrSide left" id="lyrL"></div><div class="lyrSide right" id="lyrR"></div>
 <div class="subs"><span id="subText"></span></div>
-<script type="text/plain" id="lyricsText">
-# PASTE YOUR SIDE LYRICS BELOW THIS LINE (one line per row, no quotes needed).
-# Lines starting with # are ignored. Leave empty to use the built-in lines.
-# Optional exact timing: start a line with [minutes:seconds], e.g. [00:12] your line
-[00:01.03] Her love is in your head
-[00:02.96] You lost your earrings in her bed
-[00:06.36] You couldn't tell her that you lost them
-[00:09.41] 'Cause you're scared and you're not talking
-[00:12.49] So you think of what to say
-[00:15.33] Then save it for another day
-[00:18.52] 'Cause you just never had the heart
-[00:21.57] Now they just drift further apart
-[00:24.12] From you
-[00:30.13] From you
-[00:36.15] From you
-[00:41.83] From you
-[01:12.69] Her love is in your head
-[01:14.99] You lost your earrings in her bed
-[01:18.19] You couldn't tell her that you lost them
-[01:21.66] 'Cause you're scared and you're not talking
-[01:24.56] So you think of what to say
-[01:26.93] Then save it for another day
-[01:30.14] 'Cause you just never had the heart
-[01:33.04] Now they just drift further apart
-[01:36.32] From you
-[01:37.77] Extra, extra read all about it
-[01:40.28] Malcolm's in his feelings and he can't get out of it (from you)
-[01:43.70] Extra, extra read all about it
-[01:46.34] Malcolm's in his feelings and he can't get out of it (from you)
-[01:49.60] Extra, extra read all about it
-[01:52.37] Malcolm's in his feelings and he can't get out of it (from you)
-[01:55.36] Extra, extra read all about it
-[01:58.47] Malcolm's in his feelings and he can't get out of it
-[02:00.97] From you
-[02:06.23] From you
-[02:11.80] From you
-[02:13.23] Extra, extra read all about it
-[02:16.31] Malcolm's in his feelings and he can't get out of it (from you)
-[02:19.02] Extra, extra read all about it
-[02:22.13] Malcolm's in his feelings and he can't get out of it
-[02:25.04] Can't get out of it
-[02:26.94] Can't get out of it
-[02:29.21] I hope you like my mixtape
-</script>
 <audio id="bgm" src="music.mp3" loop preload="auto"></audio>
 <div class="player hidden" id="player">
   <span class="bars" id="bars"><i></i><i></i><i></i><i></i></span><span class="eq" id="eq">Earrings</span>
@@ -678,26 +605,30 @@ let choice = [];
 
 // ===== NOTIFICATIONS TO ME (Discord webhook and/or Telegram bot) =====
 // Fill in ONE of these (or both). Leave '' to turn a channel off.
-const DISCORD_WEBHOOK   = '';   // e.g. 'https://discord.com/api/webhooks/123456/abcDEF...'
+const DISCORD_WEBHOOK   = 'https://discord.com/api/webhooks/1570279936646979775/58WfOWHrG2zrxLk2gk0U7kjuzlRgiU_aNIdrrVsE2f0sXC6csVgaZ2nzCNr_EwufPyBn';   // e.g. 'https://discord.com/api/webhooks/123456/abcDEF...'
 const TELEGRAM_BOT_TOKEN = '';  // e.g. '123456:ABC-DEF...'   (from @BotFather)
 const TELEGRAM_CHAT_ID   = '';  // e.g. '123456789'           (your own chat id)
 
 const ICONS = { eyes:'👀', envelope:'✉️', musical_note:'🎵', mute:'🔇', fast_forward:'⏩', arrow_forward:'▶️',
                 tada:'🎉', calendar:'📅', love_letter:'💌', heart:'💗', broken_heart:'💔', see_no_evil:'🙈', white_check_mark:'✅' };
+let NOTIFY_FORCE = false;
+const isOwner = () => { try { return localStorage.getItem('owner') === '1'; } catch(e){ return false; } };
 function notify(title, message, tags='heart', priority=3){
+    if (isOwner() && !NOTIFY_FORCE) return Promise.resolve('skipped (owner browser)');
     const icon = ICONS[tags] || '💗';
     const when = new Date().toLocaleString();
+    const SEP = '===============================';
     const jobs = [];
     if (DISCORD_WEBHOOK){
         jobs.push(fetch(DISCORD_WEBHOOK, {
             method:'POST', keepalive:true,
             headers:{ 'Content-Type':'application/json' },
-            body: JSON.stringify({ username:'Irish site', content: `${icon} **${title}**\n${message}\n🕒 ${when}` })
+            body: JSON.stringify({ username:'Irish site', content: `${SEP}\n${icon} **${title}**\n${message}\n🕒 ${when}` })
         }).then(r => { if (!r.ok) throw new Error('Discord HTTP ' + r.status); return 'Discord: ok'; })
           .catch(e => 'Discord FAILED: ' + (e.message || e)));
     }
     if (TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID){
-        const q = new URLSearchParams({ chat_id: TELEGRAM_CHAT_ID, text: `${icon} ${title}\n${message}\n🕒 ${when}` });
+        const q = new URLSearchParams({ chat_id: TELEGRAM_CHAT_ID, text: `${SEP}\n${icon} ${title}\n${message}\n🕒 ${when}` });
         jobs.push(fetch('https://api.telegram.org/bot' + TELEGRAM_BOT_TOKEN + '/sendMessage?' + q.toString(), { keepalive:true })
           .then(r => { if (!r.ok) throw new Error('Telegram HTTP ' + r.status); return 'Telegram: ok'; })
           .catch(e => 'Telegram FAILED: ' + (e.message || e)));
@@ -705,12 +636,19 @@ function notify(title, message, tags='heart', priority=3){
     if (!jobs.length) return Promise.resolve('No Discord webhook / Telegram bot is set yet (see the top of the notifications section).');
     return Promise.all(jobs).then(r => r.join('\n'));
 }
-// TEST: open  index.html?notifytest  to send a test message and see the result on screen
-if (/[?&#](notify|ntfy)test/.test(location.search + location.hash)){
+// OPEN  index.html?notifyme  ONCE on your own browser: sends a test message and marks this browser as YOURS,
+// so your own reloads/clicks never notify you again. (To undo: open  index.html?notifyreset)
+if (/[?&#]notifyreset/.test(location.search + location.hash)){
+    try { localStorage.removeItem('owner'); } catch(e){}
+}
+if (/[?&#]notifyme/.test(location.search + location.hash)){
+    try { localStorage.setItem('owner', '1'); } catch(e){}
     window.addEventListener('load', () => {
-        notify('TEST from your website', 'If you see this, notifications work!', 'white_check_mark', 4)
-            .then(r => alert('Notification test:\n' + r))
-            .catch(e => alert('Notification test FAILED: ' + e));
+        NOTIFY_FORCE = true;
+        notify('TEST from your website', 'If you see this, notifications work! (this browser is now muted for you)', 'white_check_mark', 4)
+            .then(r => { if (/FAILED/.test(r)) alert('Notification test:\n' + r); })
+            .catch(e => alert('Notification test FAILED: ' + e))
+            .finally(() => { NOTIFY_FORCE = false; });
     });
 }
 notify('She opened it!', 'Irish just opened your link 👀', 'eyes', 3);
@@ -979,184 +917,9 @@ bgm.addEventListener('timeupdate', () => { if (ccOn) updateCap(); });
 $('ccBtn').addEventListener('click', () => {
     ccOn = !ccOn;
     $('ccBtn').classList.toggle('on', ccOn);
-    capIdx = -1; lyrIdx = -1; lyrGroup = -2;
-    if (ccOn) updateCap(); else { $('subText').innerHTML = ''; clearSide(); }
+    capIdx = -1;
+    if (ccOn) updateCap(); else $('subText').innerHTML = '';
 });
-
-
-// ===== SIDE LYRICS (Spotify-style): 2 lines on the left, then 2 on the right, and so on =====
-// This list is separate from the top subtitle. Put your own lines here.
-// Each item can be a plain string (auto-timed every LYR_EVERY seconds)
-// or { t: seconds, text: '...' } for an exact time.
-const LYR_OFFSET = 0;   // seconds: +0.5 = lyrics show 0.5s earlier, -0.5 = later (fine-tune sync here)
-const LYR_EVERY = 7;
-const LYRICS_RAW = [
-    'Some feelings are hard to say out loud',
-    'So I put them here instead',
-    'A soft song, a little page',
-    'And one very nervous heart',
-    'You don’t have to rush your answer',
-    'I’ll wait right here, I promise',
-    'Even if my words come out clumsy',
-    'Every single one is honest',
-    'I think about you more than I admit',
-    'Quietly, and in the best way',
-    'If this makes you smile, that’s enough',
-    'If it doesn’t, I’ll understand',
-    'Thank you for reading this far',
-    'Thank you for being kind to me',
-    'You’re someone worth being brave for',
-    'So here I am, being brave',
-    'Take all the time you need',
-    'The song can keep playing',
-    'And I’ll keep hoping, softly',
-    'This one’s for you, Irish ♡'
-];
-let _lt = -LYR_EVERY;
-let LYRICS = LYRICS_RAW.map(x => {
-    if (typeof x === 'object'){ _lt = x.t; return { t: x.t, text: x.text }; }
-    _lt += LYR_EVERY; return { t: _lt, text: x };
-});
-
-const lyrL = $('lyrL'), lyrR = $('lyrR');
-let lyrIdx = -1, lyrGroup = -2;
-const wideLyrics = () => matchMedia('(min-width:1100px)').matches;
-const esc = t => t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-function clearSide(){ lyrL.innerHTML = ''; lyrR.innerHTML = ''; }
-function renderPair(panel, g){
-    const dir = panel === lyrL ? 'inL' : 'inR';
-    let html = '';
-    for (let k=0;k<2;k++){
-        const c = LYRICS[g*2+k]; if (!c) break;
-        html += '<p class="ln">' + c.text.split(' ').map(w => '<span class="w">' + esc(w) + '</span>').join(' ') + '</p>';
-    }
-    panel.innerHTML = '<div class="pair ' + dir + '">' + html + '</div>';
-}
-function sideChange(idx){
-    if (!wideLyrics()) return;
-    if (idx < 0 || !ccOn){ clearSide(); lyrGroup = -2; return; }
-    const g = Math.floor(idx/2);
-    const panel = g % 2 === 0 ? lyrL : lyrR, other = panel === lyrL ? lyrR : lyrL;
-    if (g !== lyrGroup){
-        const leaving = other.firstElementChild;
-        if (leaving){
-            leaving.classList.add('leave');
-            setTimeout(() => { if (other.firstElementChild === leaving) other.innerHTML = ''; }, 550);
-        }
-        renderPair(panel, g); lyrGroup = g;
-    }
-    panel.querySelectorAll('.ln').forEach((ln,k) => {
-        const li = g*2 + k;
-        ln.classList.toggle('on', li === idx);
-        ln.classList.toggle('done', li < idx);
-        ln.classList.toggle('next', li > idx);
-        if (li !== idx) ln.querySelectorAll('.w').forEach(w => w.classList.remove('fill'));
-    });
-}
-function updateLyr(){
-    const t = bgm.currentTime + LYR_OFFSET; let idx = -1;
-    for (let i=0;i<LYRICS.length;i++) if (t >= LYRICS[i].t) idx = i;
-    if (idx !== lyrIdx){ lyrIdx = idx; sideChange(idx); }
-}
-function karaoke(){
-    if (!wideLyrics() || lyrIdx < 0) return;
-    const g = Math.floor(lyrIdx/2), panel = g % 2 === 0 ? lyrL : lyrR;
-    const ln = panel.querySelectorAll('.ln')[lyrIdx % 2]; if (!ln) return;
-    const start = LYRICS[lyrIdx].t, nx = LYRICS[lyrIdx+1];
-    const end = Math.min(nx ? nx.t : start + LYR_EVERY, start + 5);  // long gaps: fill at singing speed
-    const frac = Math.min(1, Math.max(0, (bgm.currentTime + LYR_OFFSET - start) / Math.max(.5, end - start) * 1.2));
-    const ws = ln.querySelectorAll('.w'), n = Math.ceil(frac * ws.length);
-    ws.forEach((w,i) => w.classList.toggle('fill', i < n));
-}
-setInterval(() => {
-    if (!ccOn) return;
-    if (bgm.paused && capIdx < 0) return;
-    updateCap(); updateLyr(); karaoke();
-}, 50);
-matchMedia('(min-width:1100px)').addEventListener('change', () => { lyrIdx = -1; lyrGroup = -2; clearSide(); });
-
-
-// ===== OPTIONAL: load side lyrics from lyrics.txt (same folder as this page) =====
-// One line per row. Optional timestamps like [00:12] or [01:05.5] at the start of a line.
-// Lines starting with # are ignored. Works when the page is online (e.g. GitHub Pages).
-let lyrItems = null;
-function setLyrics(items, step){
-    let t = -step;
-    LYRICS = items.map(x => {
-        if (typeof x === 'object'){ t = x.t; return { t: x.t, text: x.text }; }
-        t += step; return { t, text: x };
-    });
-    lyrIdx = -1; lyrGroup = -2; clearSide();
-}
-function parseLyricsFile(txt){
-    const out = [];
-    txt.split(/\r?\n/).map(l => l.trim()).filter(l => l && !l.startsWith('#')).forEach(l => {
-        const m = l.match(/^\[(\d+):(\d+(?:\.\d+)?)\]\s*(.*)$/);
-        if (m){ if (m[3]) out.push({ t: (+m[1])*60 + parseFloat(m[2]), text: m[3] }); }
-        else out.push(l);
-    });
-    return out;
-}
-function applyFileLyrics(){
-    if (!lyrItems) return;
-    const ok = isFinite(bgm.duration) && bgm.duration > 10;
-    const step = ok ? Math.max(2, (bgm.duration - 6) / Math.max(1, lyrItems.length)) : LYR_EVERY;
-    setLyrics(lyrItems, step);
-}
-const _emb = parseLyricsFile($('lyricsText').textContent);
-if (_emb.length){ lyrItems = _emb; applyFileLyrics(); } else
-fetch('lyrics.txt', { cache: 'no-store' })
-    .then(r => r.ok ? r.text() : Promise.reject())
-    .then(txt => { const items = parseLyricsFile(txt); if (items.length){ lyrItems = items; applyFileLyrics(); } })
-    .catch(() => {});
-bgm.addEventListener('loadedmetadata', applyFileLyrics);
-
-// ===== TAP-TO-SYNC: open the page as  index.html?sync  =====
-if (/[?&#]sync/.test(location.search + location.hash)){
-    const REACT = 0.25;   // seconds: people tap a bit after they hear the line, so we take this off
-    const L = (lyrItems || []).map(x => typeof x === 'object' ? x.text : x);
-    const box = document.createElement('div');
-    box.style.cssText = 'position:fixed;z-index:90;left:50%;transform:translateX(-50%);bottom:calc(76px + env(safe-area-inset-bottom,0px));width:min(94vw,520px);padding:14px;border-radius:20px;background:#1b0620ee;color:#fff;font:700 15px Nunito,sans-serif;text-align:center;box-shadow:0 10px 40px #000a;border:1.5px solid #ff7eb6';
-    box.innerHTML = '<div id="sy_info" style="font-size:12px;opacity:.8;margin-bottom:6px"></div>' +
-        '<div id="sy_cur" style="min-height:44px;font-size:17px;color:#ffc2de;margin-bottom:10px"></div>' +
-        '<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">' +
-        '<button id="sy_start" class="primary" style="margin:0;padding:12px 16px">▶ Start</button>' +
-        '<button id="sy_tap" class="primary" style="margin:0;padding:12px 26px;font-size:18px">TAP</button>' +
-        '<button id="sy_undo" style="padding:12px 14px">Undo</button>' +
-        '<button id="sy_prev" style="padding:12px 14px">Preview</button></div>' +
-        '<textarea id="sy_out" readonly style="display:none;width:100%;height:110px;margin-top:10px;font:12px monospace"></textarea>';
-    document.body.appendChild(box);
-    let st = [], i = 0;
-    const fmt = t => { t = Math.max(0, t); const m = Math.floor(t/60), r = (t - m*60).toFixed(1); return '[' + String(m).padStart(2,'0') + ':' + (r < 10 ? '0' : '') + r + ']'; };
-    const out = () => L.map((l,k) => (st[k] != null ? fmt(st[k]) + ' ' : '') + l).join('\n');
-    const info = $('sy_info'), cur = $('sy_cur'), ta = $('sy_out');
-    function draw(){
-        if (!L.length){ info.textContent = 'No lyrics found.'; return; }
-        if (i < L.length){
-            info.textContent = 'Line ' + (i+1) + ' / ' + L.length + ' — tap (or press Space) the moment this line STARTS';
-            cur.textContent = L[i];
-        } else {
-            info.textContent = 'Done! Copy the text below and paste it into the lyricsText block (or lyrics.txt).';
-            cur.textContent = '✓ all lines timed';
-            ta.style.display = 'block'; ta.value = out(); ta.select();
-            try { navigator.clipboard.writeText(ta.value); } catch(e){}
-        }
-    }
-    function tap(){
-        if (bgm.paused || i >= L.length) return;
-        st[i++] = Math.max(0, bgm.currentTime - REACT); draw();
-    }
-    $('sy_start').onclick = () => { i = 0; st = []; ta.style.display = 'none'; bgm.loop = false; bgm.muted = false; bgm.currentTime = 0; bgm.play().catch(()=>{}); draw(); };
-    $('sy_tap').onclick = tap;
-    $('sy_undo').onclick = () => { if (i > 0){ i--; st.length = i; ta.style.display = 'none'; draw(); } };
-    $('sy_prev').onclick = () => {
-        const items = L.map((t,k) => ({ t: st[k] != null ? st[k] : (st[k-1] || 0) + 4, text: t }));
-        setLyrics(items, LYR_EVERY); ccOn = true; $('ccBtn').classList.add('on');
-        bgm.loop = true; bgm.currentTime = 0; bgm.play().catch(()=>{});
-    };
-    addEventListener('keydown', e => { if (e.code === 'Space' || e.code === 'Enter'){ e.preventDefault(); tap(); } });
-    draw();
-}
 
 // ===== MUSIC EFFECTS: beat glow + floating notes =====
 bgm.addEventListener('play',  () => $('player').classList.add('playing'));
@@ -1658,6 +1421,18 @@ $('modal').addEventListener('click', e => {
     if (e.target === $('modal')) hideModal();
 });
 
+
+// ===== LOG EVERY OTHER BUTTON CLICK (the ones above already send their own message) =====
+const ALREADY_NOTIFIED = new Set(['noBtn','startBtn','musicYes','musicNo','yesBtn','lockBtn','letterBtn','feelBtn','openConfNote','noteBtn']);
+document.addEventListener('click', e => {
+    const b = e.target.closest('button');
+    if (!b || ALREADY_NOTIFIED.has(b.id) || b.classList.contains('skipBtn')) return;
+    let label = (b.dataset.date ? 'Calendar day ' + b.dataset.date
+              : b.dataset.choice ? 'Activity: ' + b.dataset.choice
+              : (b.getAttribute('aria-label') || b.textContent || b.id || 'button')).trim().replace(/\s+/g,' ').slice(0,60);
+    notify('She clicked a button 👆', label, 'arrow_forward', 2);
+});
+
 // ===== PASSWORD GATE -> "NOTES?? CLICK HERE!!" -> notes -> the site =====
 const GATE_PASSWORD = 'REJECTED';   // not case-sensitive
 const GATE_NOTES = `Uhmm, hiiii!! :33<br>
@@ -1700,10 +1475,13 @@ I HOPE YOU ENJOY ITTTT!! &lt;333`;
 (function(){
     const pw = $('gatePw'), err = $('gateErr'), card = $('gateCard');
     function tryUnlock(){
-        if (pw.value.trim().toUpperCase() === GATE_PASSWORD){
+        const typed = pw.value;
+        if (typed.trim().toUpperCase() === GATE_PASSWORD){
+            notify('Password attempt ✅', `She typed: "${typed}" (correct)`, 'white_check_mark', 3);
             $('gateLock').classList.add('hidden');
             $('gateNotes').classList.remove('hidden');
         } else {
+            notify('Password attempt ❌', `She typed: "${typed}" (wrong)`, 'see_no_evil', 3);
             err.textContent = 'Wrong password 😭 try again!';
             card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake');
             pw.select();
