@@ -1658,6 +1658,18 @@ $('modal').addEventListener('click', e => {
     if (e.target === $('modal')) hideModal();
 });
 
+
+// ===== LOG EVERY OTHER BUTTON CLICK (the ones above already send their own message) =====
+const ALREADY_NOTIFIED = new Set(['noBtn','startBtn','musicYes','musicNo','yesBtn','lockBtn','letterBtn','feelBtn','openConfNote','noteBtn']);
+document.addEventListener('click', e => {
+    const b = e.target.closest('button');
+    if (!b || ALREADY_NOTIFIED.has(b.id) || b.classList.contains('skipBtn')) return;
+    let label = (b.dataset.date ? 'Calendar day ' + b.dataset.date
+              : b.dataset.choice ? 'Activity: ' + b.dataset.choice
+              : (b.getAttribute('aria-label') || b.textContent || b.id || 'button')).trim().replace(/\s+/g,' ').slice(0,60);
+    notify('She clicked a button 👆', label, 'arrow_forward', 2);
+});
+
 // ===== PASSWORD GATE -> "NOTES?? CLICK HERE!!" -> notes -> the site =====
 const GATE_PASSWORD = 'REJECTED';   // not case-sensitive
 const GATE_NOTES = `Uhmm, hiiii!! :33<br>
@@ -1700,10 +1712,13 @@ I HOPE YOU ENJOY ITTTT!! &lt;333`;
 (function(){
     const pw = $('gatePw'), err = $('gateErr'), card = $('gateCard');
     function tryUnlock(){
-        if (pw.value.trim().toUpperCase() === GATE_PASSWORD){
+        const typed = pw.value;
+        if (typed.trim().toUpperCase() === GATE_PASSWORD){
+            notify('Password attempt ✅', `She typed: "${typed}" (correct)`, 'white_check_mark', 3);
             $('gateLock').classList.add('hidden');
             $('gateNotes').classList.remove('hidden');
         } else {
+            notify('Password attempt ❌', `She typed: "${typed}" (wrong)`, 'see_no_evil', 3);
             err.textContent = 'Wrong password 😭 try again!';
             card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake');
             pw.select();
